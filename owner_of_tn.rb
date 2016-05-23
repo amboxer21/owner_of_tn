@@ -24,24 +24,24 @@ set_did_vars
 set_user_vars
 
 if Did.find_by_tn(@tn).nil?
-  puts "\nDID (#{@tn}) was not found!\n"
+  puts "\n => DID (#{@tn}) was not found!\n"
 else
-  puts "\n\nTelephone number #{@tn} belongs to:\n"
-  puts "Tenant => #{Tenant.find_by_id(@ten_id).name}"
-  puts "Workgroup => #{Location.find_by_id(@loc_id).name}"
+  puts "\n\n -> Telephone number #{@tn} belongs to:\n"
+  puts " -> Tenant => #{Tenant.find_by_id(@ten_id).name}"
+  puts " -> Workgroup => #{Location.find_by_id(@loc_id).name}"
 end
  
 if User.find_by(mobile_tn: @tn).nil?
-  puts "\nMobile number (#{@tn}) was not found.\n"
+  puts "\n => Mobile number (#{@tn}) was not found.\n"
 else
-  puts "\nTelephone number #{@utn} was found for user #{@user}."
-  puts "For locationd_id: #{@location_id}."
-  puts "For workgroup: #{@wg}.\n"
+  puts "\n -> Telephone number #{@utn} was found for user #{@user}."
+  puts " -> For locationd_id: #{@location_id}."
+  puts " -> For workgroup: #{@wg}.\n"
 end
 
 if User.find_by(mobile_tn: @tn).nil?
-  puts "\nCID for user #{@user} not found.\n"
+  puts "\n => CID for user not found.\n\n"
 else
   return if @cid.nil? || @user.nil?
-  puts "\nCID (#{@cid}) was found for user: #{@user}.\n"
+  puts "\n -> CID (#{@cid}) was found for user #{@user}.\n\n"
 end
