@@ -1,7 +1,13 @@
+#!/bin/bash
+
+echo -e "\n\n!! Enter hosted root password below !!\n\n";
+su asterisk -c "cd /home/asterisk; export RAILS_ENV=production; ruby /home/asterisk/owner_of_tn.rb $1"
+[root@app1 ~]# sudo cat /home/asterisk/owner_of_tn.rb
 #!/usr/local/bin/ruby
 require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 
 @tn = ARGV[0]
+@flag = 'true'
 
 def set_did_vars
   if !Did.find_by_tn(@tn).nil?
@@ -40,8 +46,25 @@ else
 end
 
 if User.find_by(mobile_tn: @tn).nil?
-  puts "\n => CID for user not found.\n\n"
+  puts "\n => CID for user not found.\n"
 else
   return if @cid.nil? || @user.nil?
-  puts "\n -> CID (#{@cid}) was found for user #{@user}.\n\n"
+  puts "\n -> CID (#{@cid}) was found for user #{@user}.\n"
 end
+
+Tenant.all.each do |user|
+  user.users.each do |ext|
+    unless ext.e911_callerid.nil?
+      if ext.e911_callerid =~ /#{@tn}/
+        puts "\n -> Found e911 number #{ext.e911_callerid}"
+        puts " -> For user #{ext.name}"
+        puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}.\n\n"
+        @flag = 'true'
+      else
+        @flag = 'false'
+      end
+    end
+  end
+end
+
+puts "\n => E911 number not found.\n\n" unless @flag == 'true'

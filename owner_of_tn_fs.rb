@@ -13,8 +13,8 @@ usage if $arg.nil?
 
 def login_and_query(number)
 
-  @username = 'username'
-  @password = 'password'
+  @username = 'agxxxxxx'
+  @password = 'LXXXxxxxx'
 
   $feature_servers, $results, $ext_file, $nodeName, $node = [], [], [], [], []
   $feature_servers.push('fsa.xxx.xxx','cm-fsa.xxx.xxx','pl-fsa.xxx.xxx')
@@ -28,7 +28,7 @@ def login_and_query(number)
         $nodeName.push ssh.exec!("uname -n") if !numberGrep.nil?
         file = numberGrep.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+\.num/) unless numberGrep.nil?
         $results.push numberGrep unless numberGrep.nil?
-        puts "#{$arg} not found on the #{$node.last.gsub(/\n+/,'')} feature server." if $nodeName.empty?
+        puts " => #{$arg} not found on the #{$node.last.gsub(/\n+/,'')} feature server." if $nodeName.empty?
       end
     rescue => e
       puts "Error: #{e}"
@@ -43,7 +43,9 @@ def login_and_query(number)
   end
 
   $nodeName.each do |node|
-    puts "#{$arg} belongs to account -> #{$account_number.to_s.gsub(/[\[\"\]]/,'')} on the #{node.gsub(/\n+/,'')} feature server."
+    puts "\n -> Found number #{$arg}"
+    puts " -> For account:  #{$account_number.to_s.gsub(/[\[\"\]]/,'')}"
+    puts " -> On the #{node.gsub(/\n+/,'')} feature server."
   end
 
 end
