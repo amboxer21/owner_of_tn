@@ -11,24 +11,27 @@ end
 
 usage if $arg.nil?
 
-def login_and_query(number)
+def display
+  puts "\n - Checking the feature servers now.\n\n"
+end
+
+def login_and_query(command,forward_check)
 
   @username = 'agxxxxxx'
-  @password = 'LXXXxxxxx'
+  @password = 'LXXXXXXXXXX'
 
-  $feature_servers, $results, $ext_file, $nodeName, $node = [], [], [], [], []
+  $feature_servers, $results, $node = [], [], []
   $feature_servers.push('fsa.xxx.xxx','cm-fsa.xxx.xxx','pl-fsa.xxx.xxx')
 
   $feature_servers.each do |i|
     @hostname = i
     begin
       Net::SSH.start(@hostname, @username, :password => @password ) do |ssh|
-        $node.push ssh.exec!("uname -n")
-        numberGrep = ssh.exec!("egrep #{number} /etc/asterisk/customer/*")
-        $nodeName.push ssh.exec!("uname -n") if !numberGrep.nil?
-        file = numberGrep.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+\.num/) unless numberGrep.nil?
-        $results.push numberGrep unless numberGrep.nil?
-        puts " => #{$arg} not found on the #{$node.last.gsub(/\n+/,'')} feature server." if $nodeName.empty?
+        command_res = ssh.exec!(command)
+        $node.push    ssh.exec!("uname -n")
+        command_res = command_res.scan(Regexp.union(/[0-9]+.ext:/,/[0-9]+.num:/,/[0-9]+.sip:/)).uniq.to_s unless command_res.nil?
+        command_res = command_res.scan(Regexp.union(/[0-9]+.ext/,/[0-9]+.num/,/[0-9]+.sip/))              unless command_res.nil?
+        $results.push command_res unless command_res.nil?
       end
     rescue => e
       puts "Error: #{e}"
@@ -36,18 +39,22 @@ def login_and_query(number)
   end
 
   $results.each do |line|
-    if line =~ /#{$arg}/
-      $ext_file.push line.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+\.num/)
-      $account_number = line.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+/)
-    end
+    $account_number = line.first.to_s.gsub(/.(num|ext|sip)/,"")
   end
 
-  $nodeName.each do |node|
+  #$nodeName.each do |node|
+  $node.each do |n|
+    if !$account_number.nil?
     puts "\n -> Found number #{$arg}"
-    puts " -> For account:  #{$account_number.to_s.gsub(/[\[\"\]]/,'')}"
-    puts " -> On the #{node.gsub(/\n+/,'')} feature server."
+      puts " -> For account:  #{$account_number.to_s.gsub(/[\[\"\]]/,'')}"
+      puts " -> On the #{n.gsub(/\n+/,'')} feature server."
+    else
+      puts " => #{$arg} not found on the #{$node.last.gsub(/\n+/,'')} feature server."
+    end
   end
 
 end
 
-login_and_query($arg)
+display
+login_and_query("egrep #{$arg} /etc/asterisk/customer/*",false)
+#login_and_query("asterisk -rx 'database show CFV' | egrep #{$arg}",true)

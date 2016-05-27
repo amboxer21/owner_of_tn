@@ -6,4 +6,4 @@ if [[ $# != 1 ]]; then
 fi
 
 sshpass -p 'FXXXxxxxxxxxx' ssh nobody@200.255.xxx.xxx "ruby /home/anthony/Documents/Ruby/owner_of_tn.rb $1"
-ssh -t aguevara@hosted "bash /home/aguevara/Documents/Bash/owner_of_tn.sh $1"
+sshpass -p '' s4gxxxxxxx'  ssh -t aguevara@hosted "bash /home/aguevara/Documents/Bash/owner_of_tn.sh $1"
