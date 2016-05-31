@@ -28,7 +28,7 @@ def login_and_query(command,forward_check)
     begin
       Net::SSH.start(@hostname, @username, :password => @password ) do |ssh|
         command_res = ssh.exec!(command)
-        $node.push    ssh.exec!("uname -n")
+        $node.push    ssh.exec!("uname -n") if !command_res.nil?
         command_res = command_res.scan(Regexp.union(/[0-9]+.ext:/,/[0-9]+.num:/,/[0-9]+.sip:/)).uniq.to_s unless command_res.nil?
         command_res = command_res.scan(Regexp.union(/[0-9]+.ext/,/[0-9]+.num/,/[0-9]+.sip/))              unless command_res.nil?
         $results.push command_res unless command_res.nil?
@@ -49,7 +49,7 @@ def login_and_query(command,forward_check)
       puts " -> For account:  #{$account_number.to_s.gsub(/[\[\"\]]/,'')}"
       puts " -> On the #{n.gsub(/\n+/,'')} feature server."
     else
-      puts " => #{$arg} not found on the #{$node.last.gsub(/\n+/,'')} feature server."
+      puts " => #{$arg} not found on the #{n.last.gsub(/\n+/,'')} feature server."
     end
   end
 
