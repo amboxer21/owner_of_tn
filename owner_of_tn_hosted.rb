@@ -13,7 +13,7 @@ if Did.find_by_tn(@tn).nil?
 else
   puts "\n -> Found telephone number #{@tn}"
   puts " -> Tenant => #{Tenant.find_by(id: Did.find_by_tn(@tn).tenant_id).name}"
-  puts " -> Workgroup => #{Location.find_by(location_id: Did.find_by_tn(@tn).location_id).name}"
+  puts " -> Workgroup => #{Location.find_by(id: Did.find_by_tn(@tn).location_id).name}"
   puts " -> Account number: #{Account.find_by(tenant_id: Did.find_by_tn(@tn).tenant_id).account_number}"
 end
  
