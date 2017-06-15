@@ -7,6 +7,7 @@ require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 @fwd_flag     = "false"
 @e911_flag    = "false"
 @ucid_flag    = "false"
+@fax_number   = "false"
 @umobile_flag = "false"
 
 if Did.find_by_tn(@tn).nil?
@@ -56,6 +57,14 @@ User.all.each do |ext|
       @fwd_flag = "true"
     end
   end
+  
+  next if ext.fax_did_id.nil?
+  if Did.find_by(id: ext.fax_did_id).tn.to_s.match(/#{@tn}/) && !Did.find_by(id: ext.fax_did_id).nil?
+    puts "\n\n -> Found Email-To-Fax number #{@tn}\n -> For user: #{ext.name}" unless ext.nil?
+    puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
+    puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n"
+    @fax_number = "true"
+  end
 
 end
 
@@ -70,6 +79,9 @@ puts "\n => User mobile number not found.\n\n"  unless @umobile_flag == "true"
 
 puts "\n => User Forward number not found.\n\n" unless @fwd_flag == "true"
 @fwd_flag = false
+
+puts "\n => Email-To-Fax number not found.\n\n" unless @fax_number == "true"
+@fax_number = false
 
 Tenant.all.each do |user|
   if user.callerid =~ /#{@tn}/
