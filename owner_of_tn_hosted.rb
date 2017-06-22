@@ -94,7 +94,7 @@ Tenant.all.each do |user|
     @mode.permanent_routes.each do |m|
       if Did.find_by(id: m.did_id).to_s.match(/#{@tn}/)
         puts "\n -> Number was found for tenant(#{user.name}) using MODE(#{@mode.name}). " +
-        "Going to DESTINATION(#{ScriptCall.find_by(id: @mode.script_call_id).name}).\n"
+        "Going to DESTINATION(#{ScriptCall.find_by(id: @mode.script_call_id).name}).\n\n"
         @modes = "true"
       end
     end
