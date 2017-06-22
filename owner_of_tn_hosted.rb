@@ -4,6 +4,7 @@ require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 @tn           = ARGV[0]
 
 @flag         = "false"
+@modes        = "false"
 @fwd_flag     = "false"
 @e911_flag    = "false"
 @ucid_flag    = "false"
@@ -11,16 +12,16 @@ require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 @umobile_flag = "false"
 
 if Did.find_by_tn(@tn).nil?
-  puts "\n => DID (#{@tn}) was not found!\n"
+  puts "\n => DID (#{@tn}) was not found!\n\n"
 else
-  puts "\n -> Found telephone number #{@tn}"
+  puts "\n -> Found DID #{@tn}"
   puts " -> Tenant name => #{Tenant.find_by(id: Did.find_by_tn(@tn).tenant_id).name}"
   puts " -> Tenant description => #{Tenant.find_by(id: Did.find_by_tn(@tn).tenant_id).description}"
   puts " -> Workgroup => #{Location.find_by(id: Did.find_by_tn(@tn).location_id).name}"
-  puts " -> Account number: #{Account.find_by(tenant_id: Did.find_by_tn(@tn).tenant_id).account_number}"
+  puts " -> Account number: ##{Account.find_by(tenant_id: Did.find_by_tn(@tn).tenant_id).account_number}"
 end
  
-User.all.each do |ext|
+User.extension_users.each do |ext|
   next if ext.e911_callerid.nil?
     if ext.e911_callerid =~ /#{@tn}/
       puts "\n -> Found e911 number #{ext.e911_callerid}"
@@ -57,7 +58,7 @@ User.all.each do |ext|
       @fwd_flag = "true"
     end
   end
-  
+
   next if ext.fax_did_id.nil?
   if Did.find_by(id: ext.fax_did_id).tn.to_s.match(/#{@tn}/) && !Did.find_by(id: ext.fax_did_id).nil?
     puts "\n\n -> Found Email-To-Fax number #{@tn}\n -> For user: #{ext.name}" unless ext.nil?
@@ -85,10 +86,22 @@ puts "\n => Email-To-Fax number not found.\n\n" unless @fax_number == "true"
 
 Tenant.all.each do |user|
   if user.callerid =~ /#{@tn}/
-    puts "\n -> Tenant CID (#{user.callerid}) was found for tenant #{user.name}.\n"
+    puts "\n -> Tenant CID (#{user.callerid}) was found for tenant #{user.name}, user #{user.name}.\n"
     @flag = "true"
+  end
+  Location.where(tenant_id: user.id).each do |location|
+    Mode.find_by(location_id: location.id).nil? ? next : @mode = Mode.find_by(location_id: location.id)
+    @mode.permanent_routes.each do |m|
+      if Did.find_by(id: m.did_id).to_s.match(/#{@tn}/)
+        puts "\n -> Number was found for tenant(#{user.name}) using (#{@mode.name}) MODE " +
+        "Going to DESTINATION #{ScriptCall.find_by(id: @mode.script_call_id).name}.\n"
+        @modes = "true"
+      end
+    end
   end
 end
 
 puts "\n => Tenant CID number not found.\n\n" unless @flag == "true"
 @flag = "false"
+puts "\n => Mode DID not found.\n\n" unless @modes == "true"
+@modes = "false"
