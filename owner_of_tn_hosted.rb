@@ -86,21 +86,21 @@ Tenant.all.each do |t|
 end
 
 puts "\n => User E911 number not found.\n\n"    unless @e911_flag == "true"
-@e911_flag = false
+@e911_flag    = false
 
 puts "\n => User CID number not found.\n\n"     unless @ucid_flag == "true"
-@ucid_flag = false
+@ucid_flag    = false
 
 puts "\n => User mobile number not found.\n\n"  unless @umobile_flag == "true"
 @umobile_flag = false
 
 puts "\n => User Forward number not found.\n\n" unless @fwd_flag == "true"
-@fwd_flag = false
+@fwd_flag     = false
 
 puts "\n => Email-To-Fax number not found.\n\n" unless @fax_number == "true"
-@fax_number = false
+@fax_number   = false
 
-puts "\n => Tenant CID number not found.\n\n" unless @flag == "true"
-@flag = "false"
-puts "\n => Mode DID not found.\n\n" unless @modes == "true"
+puts "\n => Tenant CID number not found.\n\n"   unless @flag == "true"
+@flag  = "false"
+puts "\n => Mode DID not found.\n\n"            unless @modes == "true"
 @modes = "false"
