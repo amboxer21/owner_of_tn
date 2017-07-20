@@ -48,8 +48,8 @@ Tenant.all.each do |t|
     if ext.e911_callerid.to_s.match(/#{@tn}/)
       puts "\n -> Found e911 number #{ext.e911_callerid}"
       puts " -> For user #{ext.name}"
-      puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}"
-      puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n" 
+      puts " -> For account ##{ext.account.account_number}"
+      puts " -> For workgroup #{ext.location.name}.\n\n" 
       @e911_flag = "true"
     end
 
@@ -57,8 +57,8 @@ Tenant.all.each do |t|
     if ext.callerid.to_s.match(/#{@tn}/)
       puts "\n -> Found CID number #{ext.callerid}"
       puts " -> For user #{ext.name}"
-      puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}"
-      puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n" 
+      puts " -> For account ##{ext.account.account_number}"
+      puts " -> For workgroup #{ext.location.name}.\n\n" 
       @ucid_flag = "true"
     end
 
@@ -66,8 +66,8 @@ Tenant.all.each do |t|
     if ext.ext_callerid.to_s.match(/#{@tn}/)
       puts "\n -> Found CID override number #{ext.ext_callerid}"
       puts " -> For user #{ext.name}"
-      puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}"
-      puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n"
+      puts " -> For account ##{ext.account.account_number}"
+      puts " -> For workgroup #{ext.location.name}.\n\n"
       @override_flag = "true"
     end
 
@@ -75,8 +75,8 @@ Tenant.all.each do |t|
     if ext.mobile_tn.to_s.match(/#{@tn}/)
       puts "\n -> Found mobile number #{ext.mobile_tn}\n"
       puts " -> For user #{ext.name}"
-      puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
-      puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n" 
+      puts " -> For account ##{ext.account.account_number}."
+      puts " -> For workgroup #{ext.location.name}.\n\n" 
       @umobile_flag = "true"
     end
 
@@ -84,8 +84,8 @@ Tenant.all.each do |t|
     ext.ami_hash.each do |key,val|
       if key.to_s.match(/CFAN/) && val.to_s.match(/#{@tn}/)
         puts "\n\n -> Found forward number #{val}\n -> For user: #{ext.name}" unless ext.nil?
-        puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
-        puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n"
+        puts " -> For account ##{ext.account.account_number}."
+        puts " -> For workgroup #{ext.location.name}.\n\n"
         @fwd_flag = "true"
       end
     end
@@ -93,8 +93,8 @@ Tenant.all.each do |t|
     next if ext.fax_did_id.nil? || Did.find_by(id: ext.fax_did_id).nil?
     if Did.find_by(id: ext.fax_did_id).tn.to_s.match(/#{@tn}/) && !Did.find_by(id: ext.fax_did_id).nil?
       puts "\n\n -> Found Email-To-Fax number #{@tn}\n -> For user: #{ext.name}" unless ext.nil?
-      puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
-      puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n"
+      puts " -> For account ##{ext.account.account_number}."
+      puts " -> For workgroup #{ext.location.name}.\n\n"
       @fax_number = "true"
     end
 
