@@ -3,9 +3,9 @@ require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 
 @tn  = ARGV[0]
 
-@active_did, @inactive_did             = "false"
-@flag, @modes, @fwd_flag, @e911_flag   = "false"
-@ucid_flag, @fax_number, @umobile_flag = "false"
+@flag, @modes, @fwd_flag, @e911_flag       = "false"
+@ucid_flag, @fax_number, @umobile_flag     = "false"
+@active_did, @inactive_did, @override_flag = "false"
 
 Tenant.all.each do |t|
 
@@ -15,14 +15,14 @@ Tenant.all.each do |t|
     @mode = Mode.find_by(location_id: location.id)
     @mode.permanent_routes.each do |m|
       if Did.find_by(id: m.did_id).to_s.match(/#{@tn}/)
-        puts "\n -> Number was found for tenant(#{user.name}) using MODE(#{@mode.name}). " +
+        puts "\n -> Number was found for tenant(#{t.name}) using MODE(#{@mode.name}). " +
         "Going to DESTINATION(#{ScriptCall.find_by(id: @mode.script_call_id).name}).\n\n"
         @modes = "true"
       end
     end
 
     next if location.active_dids.nil?
-    if location.active_dids.to_s =~ /#{@tn}/
+    if location.active_dids.to_s.match(/#{@tn}/)
       puts "\n -> Found active DID #{@tn}"
       puts " -> Tenant name => #{t.name}"
       puts " -> Tenant description => #{t.description}"
@@ -32,7 +32,7 @@ Tenant.all.each do |t|
     end
 
     next if location.inactive_dids.nil?
-    if location.inactive_dids.to_s =~ /#{@tn}/
+    if location.inactive_dids.to_s.match(/#{@tn}/)
       puts "\n -> Found inactive DID #{@tn}"
       puts " -> Tenant name => #{t.name}"
       puts " -> Tenant description => #{t.description}"
@@ -45,7 +45,7 @@ Tenant.all.each do |t|
 
   t.users.extension_users.each do |ext|
     next if ext.e911_callerid.nil?
-    if ext.e911_callerid =~ /#{@tn}/
+    if ext.e911_callerid.to_s.match(/#{@tn}/)
       puts "\n -> Found e911 number #{ext.e911_callerid}"
       puts " -> For user #{ext.name}"
       puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}"
@@ -54,7 +54,7 @@ Tenant.all.each do |t|
     end
 
     next if ext.callerid.nil?
-    if ext.callerid =~ /#{@tn}/
+    if ext.callerid.to_s.match(/#{@tn}/)
       puts "\n -> Found CID number #{ext.callerid}"
       puts " -> For user #{ext.name}"
       puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}"
@@ -62,8 +62,17 @@ Tenant.all.each do |t|
       @ucid_flag = "true"
     end
 
+    next if ext.ext_callerid.nil?
+    if ext.ext_callerid.to_s.match(/#{@tn}/)
+      puts "\n -> Found CID override number #{ext.ext_callerid}"
+      puts " -> For user #{ext.name}"
+      puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}"
+      puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n"
+      @override_flag = "true"
+    end
+
     next if ext.mobile_tn.nil?
-    if ext.mobile_tn =~ /#{@tn}/
+    if ext.mobile_tn.to_s.match(/#{@tn}/)
       puts "\n -> Found mobile number #{ext.mobile_tn}\n"
       puts " -> For user #{ext.name}"
       puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
@@ -73,7 +82,7 @@ Tenant.all.each do |t|
 
     next if ext.ami_hash.nil?
     ext.ami_hash.each do |key,val|
-      if key =~ /CFAN/ && val =~ /#{@tn}/
+      if key.to_s.match(/CFAN/) && val.to_s.match(/#{@tn}/)
         puts "\n\n -> Found forward number #{val}\n -> For user: #{ext.name}" unless ext.nil?
         puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
         puts " -> For workgroup #{Location.find_by(tenant_id: ext.tenant_id).name}.\n\n"
@@ -81,7 +90,7 @@ Tenant.all.each do |t|
       end
     end
 
-    next if ext.fax_did_id.nil?
+    next if ext.fax_did_id.nil? || Did.find_by(id: ext.fax_did_id).nil?
     if Did.find_by(id: ext.fax_did_id).tn.to_s.match(/#{@tn}/) && !Did.find_by(id: ext.fax_did_id).nil?
       puts "\n\n -> Found Email-To-Fax number #{@tn}\n -> For user: #{ext.name}" unless ext.nil?
       puts " -> For account ##{Account.find_by(tenant_id: ext.tenant_id).account_number}."
@@ -90,8 +99,8 @@ Tenant.all.each do |t|
     end
 
     next if ext.callerid.nil?
-    if ext.callerid =~ /#{@tn}/
-      puts "\n -> Tenant CID (#{ext.callerid}) was found for tenant #{t.name}, user #{ext.name}.\n"
+    if ext.callerid.to_s.match(/#{@tn}/)
+      puts "\n -> User CID (#{ext.callerid}) was found for tenant #{t.name}, user #{ext.name}.\n"
       @flag = "true"
     end
 
@@ -124,3 +133,6 @@ puts "\n => Active DID not found.\n\n"          unless @active_did == "true"
 
 puts "\n => Inactive DID not found.\n\n"        unless @inactive_did == "true"
 @inactive_did = "false"
+
+puts "\n => Callerid override not found.\n\n"   unless @override_flag == "true"
+@override_flag = "false"
