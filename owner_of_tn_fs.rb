@@ -2,8 +2,6 @@
 
 require 'net/ssh'
 
-$arg = ARGV[0]
-
 def usage
   print("\n\nUsage: ./owner_of_tn.rb <telephone number>\n\n")
   exit
@@ -12,53 +10,36 @@ end
 usage if $arg.nil?
 
 def display
-  puts "\n - Checking the feature servers now.\n\n"
+  puts "\n ** Checking the feature servers now **\n\n"
 end
 
 def login_and_query(number)
 
   @username = 'agxxxxxx'
-  @password = 'LIMAxxxxxxx'
+  @password = 'LXXX XXXX X'
 
-  $feature_servers, $results, $ext_file, $nodeName, $node = [], [], [], [], []
-  $feature_servers.push('fsa.xxxxxxxx.com','cx-fsa.xxxxxxxx.com','px-fsa.xxxxxxxx.com')
+  @ngrep = {}
+  $feature_servers = []
+  $feature_servers.push('fxx.xxxxxxxx.com','cm-xxx.xxxxxxxx.com','pl-xxx.xxxxxxxx.com')
 
-  $feature_servers.each do |i|
-    @hostname = i
+  $feature_servers.each do |s|
     begin
-      Net::SSH.start(@hostname, @username, :password => @password ) do |ssh|
-        $node.push ssh.exec!("uname -n")
-        numberGrep = ssh.exec!("egrep #{number} /etc/asterisk/customer/*")
-        $nodeName.push ssh.exec!("uname -n") if !numberGrep.nil?
-        file = numberGrep.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+\.num/) unless numberGrep.nil?
-        $results.push numberGrep unless numberGrep.nil?
-        puts " => #{$arg} not found on the #{$node.last.gsub(/\n+/,'')} feature server." if $nodeName.empty?
+      Net::SSH.start(s, @username, :password => @password ) do |ssh|
+        @ngrep[ssh.exec!("uname -n")] = ssh.exec!("egrep #{number} /etc/asterisk/customer/*")
+          .scan(/\d+\.\w{3}/).uniq
+          .to_s.scan(/\d+/).uniq
       end
     rescue => e
       puts "Error: #{e}"
     end
   end
 
-  $results.each do |line|
-    if line =~ /#{$arg}/
-      $ext_file.push line.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+\.num/)
-      $account_number = line.scan(/[0-9]+.num:/).uniq.to_s.scan(/[0-9]+/)
-    end
-  end
-
-  $nodeName.each do |node|
-
-    if $account_number.to_s.gsub(/[\[\"\]]/,'').empty?
-      puts "\n -> Number #{$arg} not found"
-      puts " -> On the #{node.gsub(/\n+/,'')} feature server."
-    else
-      puts "\n -> Found number #{$arg}"
-      puts " -> For account:  #{$account_number.to_s.gsub(/[\[\"\]]/,'')}"
-      puts " -> On the #{node.gsub(/\n+/,'')} feature server."
-    end
+  @ngrep.each do |key,val|
+    server = key.upcase.gsub(/\n/,'')
+    puts " -> Found #{number} on the [ #{server} ] feature sever for account(s) #{val}" if !val.empty?
   end
 
 end
 
 display
-login_and_query($arg)
+login_and_query(ARGV[0])
