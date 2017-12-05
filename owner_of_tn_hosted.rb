@@ -9,6 +9,8 @@ require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 
 Tenant.all.each do |t|
 
+  puts " -> Found tenant default callerid number(#{@tn}) for tenant #{t.name}" if t.callerid.match(/#{@tn}/)
+
   t.locations.each do |location|
 
     next if Mode.find_by(location_id: location.id).nil?
