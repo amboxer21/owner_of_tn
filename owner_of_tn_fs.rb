@@ -7,7 +7,7 @@ def usage
   exit
 end
 
-usage if $arg.nil?
+usage if ARGV[0].nil?
 
 def display
   puts "\n ** Checking the feature servers now **\n\n"
