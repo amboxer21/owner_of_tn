@@ -19,10 +19,9 @@ def login_and_query(number)
   @password = 'LXXX XXXX X'
 
   @ngrep = {}
-  $feature_servers = []
-  $feature_servers.push('fxx.xxxxxxxx.com','cm-xxx.xxxxxxxx.com','pl-xxx.xxxxxxxx.com')
+  @feature_servers = ['fxx.xxxxxxxx.com','cm-xxx.xxxxxxxx.com','pl-xxx.xxxxxxxx.com']
 
-  $feature_servers.each do |s|
+  @feature_servers.each do |s|
     begin
       Net::SSH.start(s, @username, :password => @password ) do |ssh|
         @ngrep[ssh.exec!("uname -n")] = ssh.exec!("egrep #{number} /etc/asterisk/customer/*")
