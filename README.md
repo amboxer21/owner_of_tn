@@ -1,5 +1,7 @@
 ## [ **File Placement** ]
 
+- 1
+
 **File:** 
 
 > owner_of_tn_fs.rb
@@ -9,6 +11,27 @@
 > [anthony@ghost Documents]$ ls /home/nobody/Documents/Ruby/owner_of_tn.rb
 /home/nobody/Documents/Ruby/owner_of_tn.rb
 
+- 2
+
+**File:**
+
+> owner_of_tn_hosted.sh
+
+**Location:**
+
+> [aguevara@app0 ~]$ ls /home/aguevara/Documents/Bash/owner_of_tn.sh
+/home/aguevara/Documents/Bash/owner_of_tn.sh
+
+- 3
+
+**File:**
+
+> owner_of_tn_hosted.rb
+
+**Location**
+
+> [asterisk@app0 root]$ ls /home/asterisk/owner_of_tn.rb
+/home/asterisk/owner_of_tn.rb
 -------------------------------------------------------------------------
 
 ## [ **USAGE** ]
