@@ -9,7 +9,8 @@
 **Location:**
 
 > [anthony@ghost Documents]$ ls /home/nobody/Documents/Ruby/owner_of_tn.rb
-/home/nobody/Documents/Ruby/owner_of_tn.rb
+
+> /home/nobody/Documents/Ruby/owner_of_tn.rb
 
 - 2
 
@@ -20,7 +21,8 @@
 **Location:**
 
 > [aguevara@app0 ~]$ ls /home/aguevara/Documents/Bash/owner_of_tn.sh
-/home/aguevara/Documents/Bash/owner_of_tn.sh
+
+> /home/aguevara/Documents/Bash/owner_of_tn.sh
 
 - 3
 
@@ -31,7 +33,21 @@
 **Location**
 
 > [asterisk@app0 root]$ ls /home/asterisk/owner_of_tn.rb
-/home/asterisk/owner_of_tn.rb
+
+> /home/asterisk/owner_of_tn.rb
+
+- 4
+
+**File**
+
+> owner_of_tn.sh
+
+**Location**
+
+> anthony@mtt3:~$ ls /bin/owner_of_tn.sh
+
+> /bin/owner_of_tn.sh
+
 -------------------------------------------------------------------------
 
 ## [ **USAGE** ]
