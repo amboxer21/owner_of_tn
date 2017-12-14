@@ -24,8 +24,7 @@ def login_and_query(number)
   @feature_servers.each do |s|
     begin
       Net::SSH.start(s, @username, :password => @password ) do |ssh|
-        @ngrep[ssh.exec!("uname -n")] = ssh.exec!("egrep #{number} /etc/asterisk/customer/*")
-          .scan(/\d+\.\w{3}/).uniq
+        @ngrep[ssh.exec!("uname -n")] = ssh.exec!("egrep -l #{number} /etc/asterisk/customer/*")
           .to_s.scan(/\d+/).uniq
       end
     rescue => e
