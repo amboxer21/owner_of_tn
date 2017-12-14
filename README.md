@@ -1,3 +1,20 @@
+## [ **USAGE** ]
+**The script is ran from mtt3 like so:**
+> anthony@mtt3:~$ owner_of_tn.sh 7325551234
+
+## [ **Script Location** ]
+> anthony@mtt3:~$ locate owner_of_tn.sh           
+> /bin/owner_of_tn.sh
+> /var/home/anthony/Documents/Bash/owner_of_tn.sh
+
+-----------------------------------------------------------------------------
+
+## [ **Description** ]
+
+> This script checks the feature servers and the hosted portal for onwership of a TN.
+
+------------------------------------------------------------------------------
+
 ## [ **File Placement** ]
 
 - 1
@@ -47,14 +64,3 @@
 > anthony@mtt3:~$ ls /bin/owner_of_tn.sh
 
 > /bin/owner_of_tn.sh
-
--------------------------------------------------------------------------
-
-## [ **USAGE** ]
-**The script is ran from mtt3 like so:**
-> anthony@mtt3:~$ owner_of_tn.sh 7325551234
-
-## [ **Script Location** ]
-> anthony@mtt3:~$ locate owner_of_tn.sh           
-> /bin/owner_of_tn.sh
-> /var/home/anthony/Documents/Bash/owner_of_tn.sh
