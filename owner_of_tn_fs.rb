@@ -35,7 +35,9 @@ def login_and_query(number)
 
   @ngrep.each do |key,val|
     server = key.upcase.gsub(/\n/,'')
-    puts " -> Found #{number} on the [ #{server} ] feature sever for account(s) #{val}" if !val.empty?
+    val.empty? ?
+      (puts " => #{number} not found on the [ #{server} ] feature server") :
+      (puts " -> Found #{number} on the [ #{server} ] feature sever for account(s) #{val}")
   end
 
 end
