@@ -25,18 +25,19 @@ def login_and_query(number)
     begin
       Net::SSH.start(s, @username, :password => @password ) do |ssh|
         @ngrep[ssh.exec!("uname -n")] = ssh.exec!("egrep -l #{number} /etc/asterisk/customer/*")
-          .to_s.scan(/\d+/).uniq
+          .to_s.scan(/\d{5}\./).uniq
       end
     rescue => e
       puts "Error: #{e}"
     end
   end
 
-  @ngrep.each do |key,val|
-    server = key.upcase.gsub(/\n/,'')
-    val.empty? ?
+  @ngrep.each do |key,val| 
+    server  = key.upcase.gsub(/\n/,'')
+    account = val.to_s.gsub(/\./,'')
+    account.empty? ?
       (puts " => #{number} not found on the [ #{server} ] feature server") :
-      (puts " -> Found #{number} on the [ #{server} ] feature sever for account(s) #{val}")
+      (puts " -> Found #{number} on the [ #{server} ] feature sever for account(s) #{account}")
   end
 
 end
