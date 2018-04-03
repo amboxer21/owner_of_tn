@@ -9,12 +9,28 @@ require "/var/asterisk/hosted/current/hpbxgui/config/environment.rb"
 
 Tenant.all.each do |t|
 
-  puts " -> Found tenant default callerid number(#{@tn}) for tenant #{t.name}" if t.callerid.match(/#{@tn}/)
+  if t.callerid.match(/#{@tn}/)
+    puts " -> Found tenant default callerid number(#{@tn}) for tenant #{t.name}"
+  end
+  t.inactive_dids.each do |d|
+    if d.tn.to_s.match(/#{@tn}/)
+      puts " -> Found inactive did(#{d.tn}) for tenant #{t.name}"
+      @inactive_did = "true"
+    end
+  end
+  t.active_dids.each do |d|
+    if d.tn.to_s.match(/#{@tn}/)
+      puts " -> Found active did(#{d.tn}) for tenant #{t.name}"
+      @active_did = "true"
+    end
+  end
 
   t.locations.each do |location|
 
-    next if Mode.find_by(location_id: location.id).nil?
+    #next if Mode.find_by(location_id: location.id).nil?
+    #@mode = Mode.find_by(location_id: location.id)
     @mode = Mode.find_by(location_id: location.id)
+    next if @mode.nil?
     @mode.permanent_routes.each do |m|
       if Did.find_by(id: m.did_id).to_s.match(/#{@tn}/)
         puts "\n -> Number was found for tenant(#{t.name}) using MODE(#{@mode.name}). " +
@@ -24,22 +40,26 @@ Tenant.all.each do |t|
     end
 
     next if location.active_dids.nil?
-    if location.active_dids.to_s.match(/#{@tn}/)
-      puts "\n -> Found active DID #{@tn}"
-      puts " -> Tenant name => #{t.name}"
-      puts " -> Tenant description => #{t.description}"
-      puts " -> Workgroup => #{location.name}"
-      puts " -> Account number: ##{Account.find_by(tenant_id: t.id).account_number}"
+    location.active_dids.each do |d|
+      if d.to_s.match(/#{@tn}/)
+        puts "\n -> Found active DID #{@tn}"
+        puts " -> Tenant name => #{t.name}"
+        puts " -> Tenant description => #{t.description}"
+        puts " -> Workgroup => #{location.name}"
+        puts " -> Account number: ##{Account.find_by(tenant_id: t.id).account_number}"
+      end
       @active_did = "true"
     end
 
-    next if location.inactive_dids.nil?
-    if location.inactive_dids.to_s.match(/#{@tn}/)
-      puts "\n -> Found inactive DID #{@tn}"
-      puts " -> Tenant name => #{t.name}"
-      puts " -> Tenant description => #{t.description}"
-      puts " -> Workgroup => #{location.name}"
-      puts " -> Account number: ##{Account.find_by(tenant_id: t.id).account_number}"
+    next if location.inactive_dids.nil? or location.inactive_dids.empty?
+    location.inactive_dids.each do |d|
+      if d.tn.to_s.match(/#{@tn}/)
+        puts "\n -> Found inactive DID #{@tn}"
+        puts " -> Tenant name => #{t.name}"
+        puts " -> Tenant description => #{t.description}"
+        puts " -> Workgroup => #{location.name}"
+        puts " -> Account number: ##{Account.find_by(tenant_id: t.id).account_number}"
+      end
       @inactive_did = "true"
     end
 
@@ -92,8 +112,11 @@ Tenant.all.each do |t|
       end
     end
 
-    next if ext.fax_did_id.nil? || Did.find_by(id: ext.fax_did_id).nil?
-    if Did.find_by(id: ext.fax_did_id).tn.to_s.match(/#{@tn}/) && !Did.find_by(id: ext.fax_did_id).nil?
+    @fax_did = Did.find_by(id: ext.fax_did_id)
+    #next if ext.fax_did_id.nil? || Did.find_by(id: ext.fax_did_id).nil?
+    next if ext.fax_did_id.nil? || @fax_did.nil?
+    #if Did.find_by(id: ext.fax_did_id).tn.to_s.match(/#{@tn}/) && !Did.find_by(id: ext.fax_did_id).nil?
+    if @fax_did.tn.to_s.match(/#{@tn}/) && !@fax_did.nil?
       puts "\n\n -> Found Email-To-Fax number #{@tn}\n -> For user: #{ext.name}" unless ext.nil?
       puts " -> For account ##{ext.account.account_number}."
       puts " -> For workgroup #{ext.location.name}.\n\n"
